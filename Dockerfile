@@ -3,27 +3,42 @@ FROM alpine:3.18
 RUN apk add --no-cache bash wget
 
 
-### Set your versions to download/build and test here
-# Release versions (to download) and commit hashes (to build) are allowed.
-# Strings matching "<number>.<number>.<number>" are treated as downloadable releases,
-# everything else is treated as git revision or tag.
+##
+# Allowed values for the VERSIONS argument:
+# - release versions matching "<number>.<number>.<number>": released binaries will be downloaded
+# - any other string representing one of: commit hash, tag, branch,
+#   pull release (format: "PR-<number>"): code from the corresponding git tree will be built
 #
-# We have different lists for ARM and x86,
-# because there were no linux/arm64 builds before v3.8.6, so they have to be tags to build locally.
+# Building pull releases requires GH_TOKEN build-arg to be set (can be a classic PAT with zero permissions)
 #
-ENV VERSIONS_ARM64="kustomize/v3.5.4 kustomize/v3.7.0 kustomize/v3.8.0 1c6481d0 00f0fd71 kustomize/v3.8.3 3.8.6 4.1.2 4.3.0 4.4.0 4.5.4 4.5.5 5.0.0 5.2.1"
-ENV VERSIONS_X86_64="3.5.4 3.7.0 3.8.0 1c6481d0 00f0fd71 3.8.3 3.8.6 4.1.2 4.3.0 4.4.0 4.5.4 4.5.5 5.0.0 5.1.0 5.2.1"
+# example:
+#         docker build --build-arg VERSIONS="5.2.1 PR-5076 master" .
+#         - or -
+#         ./build-amd64 5.2.1 master
+#         ./build-arm64 5.2.1 master
+#         GH_TOKEN=ghp_xxxxx ./build-amd64 5.2.1 PR-5076 master
+##
 
+ARG VERSIONS
+ENV VERSIONS=${VERSIONS}
+
+# required if you build PRs
+ARG GH_TOKEN
+ENV GH_TOKEN=${GH_TOKEN}
+ENV GH_CLI_VERSION=2.37.0
 
 WORKDIR /opt
 SHELL ["/bin/bash", "-c"]
 
 COPY tests/ tests/
-COPY build.sh get-arch.sh /opt
-RUN chmod a+x build.sh
-RUN ./build.sh
+COPY scripts/build-binaries.sh scripts/get-arch.sh /opt
+RUN chmod a+x build-binaries.sh
+RUN ./build-binaries.sh
 
-COPY run-test.sh /opt
+COPY scripts/run-test.sh /opt
 RUN chmod a+x run-test.sh
+
+# reset the sensitive var
+ENV GH_TOKEN=
 
 ENTRYPOINT [ "/bin/bash", "-c", "/opt/run-test.sh" ]

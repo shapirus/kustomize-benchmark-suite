@@ -21,6 +21,20 @@ function download
 	&& rm -rf $temp
 }
 
+function install_gh_cli
+{
+	mkdir -p $HOME/bin
+	local TMPDIR=$(mktemp -d)
+	(
+		cd $TMPDIR
+		wget -nv https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_${URI_ARCH}.tar.gz -O gh_${GH_CLI_VERSION}_linux_${URI_ARCH}.tar.gz
+		tar xzf gh_${GH_CLI_VERSION}_linux_${URI_ARCH}.tar.gz
+		mv gh_${GH_CLI_VERSION}_linux_${URI_ARCH}/bin/gh $HOME/bin
+		chmod a+x $HOME/bin/gh
+	)
+	rm -rf $TMPDIR
+}
+
 function build
 {
 	local revision=$1
@@ -32,7 +46,17 @@ function build
 	BUILDDIR=$(mktemp -d)
 	cp -a $GITDIR/. $BUILDDIR
 	cd $BUILDDIR
-	git checkout $revision
+
+	# support building pull requests: requires installing the github cli utility
+	if [[ $revision =~ ^PR-[0-9] ]]; then
+		if [ ! -v GH_CLI_INSTALLED ]; then
+			install_gh_cli
+		fi
+		$HOME/bin/gh pr checkout $(echo "$revision" | sed 's/^PR-//')
+	else
+		git checkout $revision
+	fi
+
 	revision=$(echo "$revision" | sed 's@^kustomize/@@')
 	cd kustomize
 	go mod tidy
@@ -43,6 +67,11 @@ function build
 
 BINDIR=$PWD/binaries
 mkdir $BINDIR
+
+if [ -z "${VERSIONS:-}" ] ; then
+	echo "ERROR: build variable VERSIONS must be defined" >&2
+	exit 1
+fi
 
 for ver in $VERSIONS; do \
 	if [[ $ver =~ ^[0-9]\.[0-9]\.[0-9] ]]; then

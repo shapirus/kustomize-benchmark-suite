@@ -1,0 +1,5 @@
+#!/bin/sh
+
+PLATFORM=linux/amd64
+
+. ./docker-build.sh
