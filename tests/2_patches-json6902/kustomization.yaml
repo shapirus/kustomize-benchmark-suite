@@ -1,0 +1,16 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+resources:
+- deployment.yaml
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 2
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: test
