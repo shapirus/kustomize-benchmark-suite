@@ -6,11 +6,6 @@ patches:
     - op: replace
       path: /spec/replicas
       value: 6
-    - op: add
-      path: /spec/metadata
-      value:
-        labels:
-          generated-with-component-json6902: "true"
   target:
     group: apps
     version: v1

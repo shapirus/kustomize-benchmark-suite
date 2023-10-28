@@ -7,7 +7,5 @@ patches:
     kind: Deployment
     metadata:
       name: test
-      labels:
-        generated-with-component-PSM: "true"
     spec:
       replicas: 7

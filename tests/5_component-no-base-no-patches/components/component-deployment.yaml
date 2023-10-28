@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test
+  name: test-component
 spec:
-  replicas: 1
+  replicas: 5
