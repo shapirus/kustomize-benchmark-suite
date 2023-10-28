@@ -10,4 +10,4 @@ patches:
       labels:
         generated-with-component-PSM: "true"
     spec:
-      replicas: 5
+      replicas: 7
