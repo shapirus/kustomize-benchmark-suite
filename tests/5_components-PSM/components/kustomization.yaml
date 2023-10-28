@@ -1,0 +1,13 @@
+kind: Component
+apiVersion: kustomize.config.k8s.io/v1alpha1
+
+patches:
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: test
+      labels:
+        generated-with-component-PSM: "true"
+    spec:
+      replicas: 5

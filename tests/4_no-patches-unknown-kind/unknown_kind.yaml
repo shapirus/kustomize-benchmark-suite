@@ -3,4 +3,4 @@ kind: UnknownKind
 metadata:
  name: test
 spec:
-  replicas: 1
+  replicas: 4
