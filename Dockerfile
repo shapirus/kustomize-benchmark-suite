@@ -17,6 +17,8 @@ RUN apk add --no-cache bash wget
 #         ./build-amd64 5.2.1 master
 #         ./build-arm64 5.2.1 master
 #         GH_TOKEN=ghp_xxxxx ./build-amd64 5.2.1 PR-5076 master
+#
+# versions to test can also be defined in the "versions-to-test" file, newline or space separated values.
 ##
 
 ARG VERSIONS
