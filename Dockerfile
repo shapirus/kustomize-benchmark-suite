@@ -32,10 +32,11 @@ ENV GH_CLI_VERSION=2.37.0
 WORKDIR /opt
 SHELL ["/bin/bash", "-c"]
 
-COPY tests/ tests/
 COPY scripts/build-binaries.sh scripts/get-arch.sh /opt
 RUN chmod a+x build-binaries.sh
 RUN ./build-binaries.sh
+
+COPY tests/ tests/
 
 COPY scripts/run-test.sh /opt
 RUN chmod a+x run-test.sh
