@@ -24,12 +24,11 @@ function get_version
 
 TESTS=$(ls tests | sort | while read test; do echo -n "$test ";done)
 
-echo -e "\033[1;35m### Starting benchmark on \033[1;32m$(uname -s -m)"
-echo
-echo -e "\033[1;35m# kustomize versions: \033[1;32m$VERSIONS"
-echo -e "\033[1;35m# iterations per test: \033[1;32m$iterations"
-echo -e "\033[1;35m# tests: \033[1;32m$TESTS"
-echo -e "\033[1;35m# time unit: \033[1;32mseconds"
+echo -e "\033[1;35mStarting kustomize benchmark on \033[0;32m$(uname -s -m)"
+echo -e "\033[1;35mkustomize versions: \033[0;36m$(echo;for v in $VERSIONS;do printf '  %s\n' $v;done)"
+echo -e "\033[1;35miterations per test: \033[0;32m$iterations"
+echo -e "\033[1;35mtests: \033[0;36m$(echo;for t in $TESTS;do printf '  %s\n' $t;done)"
+echo -e "\033[1;35mtime unit: \033[0;32mseconds"
 echo -e "\033[0m"
 
 printf "\033[1;35m%10s"
@@ -65,7 +64,7 @@ for ver in $VERSIONS; do
 			exit 1
 		fi
 		set -e
-		printf "\033[1;32m%10s\033[0m" $duration
+		printf "\033[0;36m%10s\033[0m" $duration
 	done
 	echo
 done
