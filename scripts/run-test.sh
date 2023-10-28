@@ -40,6 +40,9 @@ for t in $TESTS; do
 done
 echo -e "\033[0m"
 
+EXIT_REQ=0
+trap EXIT_REQ=1 INT
+
 for ver in $VERSIONS; do
 	ver=$(echo "$ver" | sed 's@^kustomize/@@')
 	binary=binaries/kustomize-$ver
@@ -47,12 +50,21 @@ for ver in $VERSIONS; do
 	printf "\033[1;35m%10s\033[0m" $version
 	for test in $TESTS; do
 		TIMEFORMAT=%2R
+		set +e
 		duration=$(
-			(time for ((i = 0; i < $iterations; i++)) \
+			(time for ((i = 0; i < $iterations && $? == 0; i++)) \
 			do
 				$binary build tests/$test &>/dev/null
 			done) 2>&1
 		)
+		if [ $? != 0 ]; then
+			duration="(fail)"
+		fi
+		if [ $EXIT_REQ == 1 ]; then
+			echo -e "\033[0mExiting on SIGINT"
+			exit 1
+		fi
+		set -e
 		printf "\033[1;32m%10s\033[0m" $duration
 	done
 	echo
