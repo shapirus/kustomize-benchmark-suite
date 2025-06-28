@@ -4,7 +4,7 @@ VERSIONS="$@"
 
 if [ -z "$VERSIONS" ]; then
 	if [ -f versions-to-test ]; then
-		VERSIONS=$(cat versions-to-test)
+		VERSIONS=$(cat versions-to-test | grep -v '^#')
 	fi
 fi
 
